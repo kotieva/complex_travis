@@ -1,82 +1,70 @@
-#include "complex.hpp"
-Complex::Complex():Re(0.0),Im(0.0){};
-Complex::Complex(double re, double im): Re(re), Im(im){}
-Complex::Complex(const Complex& other): Re(other.Re), Im(other.Im){}
+#include <fstream>
+#include <iostream>
+using namespace std;
 
-void Complex::print(ostream& os){
-    if(Im < 0){
-        os << Re << Im << "i" << endl;
-    }else{
-        os << Re <<"+"<< Im << "i" << endl;
-    }
-}
-
-double Complex::real(){
-    return Re;
-}
-double Complex::imaginary(){
-    return Im;
-}
-
-
-Complex Complex::add(const Complex& other){
-    return Complex(Re+other.Re, Im+other.Im);
-}
-Complex Complex::sub(const Complex& other){
-    return Complex(Re-other.Re, Im-other.Im);
-}
-Complex Complex::mul(int number){
-    return Complex(Re*number, Im*number);
-}
-Complex Complex::div(int number){
-    try{
-        if(number == 0){
-            throw 1;
+class Matrix {
+private:
+    int **ptr;
+    int rows;
+    int columns;
+public:
+    Matrix() {
+        rows = 5;
+        columns = 5;
+        ptr = new int*[rows];
+        for(int i = 0; i < rows; ++i) {
+            ptr[i] = new int[columns];
         }
-        Re = Re/number;
-        Im = Im/number;
-    }catch (int number){
-        cout << "Division by zero" << endl;
-
     }
-    return Complex(Re, Im);
-}
 
-Complex Complex::operator*(const Complex& other){
-    return Complex(Re*other.Re - Im*other.Im, Im*other.Re + Re*other.Im);
-}
-Complex Complex::operator/(const Complex& other){
-    return Complex((Re*other.Re + Im*other.Im)/(other.Re*other.Re + other.Im*other.Im),(-Re*other.Im + Im*other.Re)/(other.Re*other.Re + other.Im*other.Im));
-}
-Complex Complex::operator+=(const Complex& other){
-    Re += other.Re;
-    Im += other.Im;
-    return Complex(Re, Im);
-}
-Complex Complex::operator-=(const Complex& other){
-    Re -= other.Re;
-    Im -= other.Im;
-    return Complex(Re, Im);
-}
-Complex Complex::operator*=(const Complex& other){
-    double  tmp;
-    tmp = Re*other.Re - Im*other.Im;
-    Im = Im*other.Re + Re*other.Im;
-    Re = tmp;
-    return Complex(Re,Im);
-}
-Complex Complex::operator/=(const Complex& other){
-    double tmp;
-    tmp = (Re*other.Re + Im*other.Im)/(other.Re*other.Re + other.Im*other.Im);
-    Im =  (-Re*other.Im + Im*other.Re)/(other.Re*other.Re + other.Im*other.Im);
-    Re = tmp;
-    return Complex(Re,Im);
-}
-Complex Complex::operator=(const Complex& other){
-    Re = other.Re;
-    Im = other.Im;
-    return Complex(Re,Im);
-}
-bool Complex::operator==(const Complex& other){
-    return (Re == other.Re && Im == other.Im);
+    Matrix(int _rows, int _columns) {
+        rows = _rows;
+        columns = _columns;
+        ptr = new int*[rows];
+        for(int i = 0; i < rows; ++i) {
+            ptr[i] = new int[columns];
+        }
+    }
+
+    ~Matrix() {
+        delete [] ptr;
+    }
+
+    int getRows() {
+        return rows;
+    }
+
+    int getColumns() {
+        return columns;
+    }
+
+    void print() {
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < columns; ++j) {
+                cout << ptr[i][j] << " ";
+            }
+            cout << endl;
+        }
+    }
+
+    void fill(string path) {
+        ifstream fin;
+        fin.open(path);
+        if (!fin.is_open()) {
+            cout << "Ошибка открытия файла!" << endl;
+        } else {
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < columns; j++) {
+                    fin >> ptr[i][j];
+                }
+            }
+        }
+    }
+};
+
+int main(int argc, const char * argv[]) {
+    Matrix myMatrix(3, 3);
+    myMatrix.fill("sinput.txt");
+    myMatrix.print();
+    return 0;
 }
